@@ -3,7 +3,7 @@ from models import TrendsTitle, db
 from flask_migrate import Migrate
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/trends'
+app.config['SQLALCHEMY_DATABASE_URI'] = '"mysql+pymysql://root:password@localhost/trends'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 migrate = Migrate(app, db)
