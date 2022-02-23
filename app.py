@@ -1,9 +1,11 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template,redirect,url_for,flash,session
 from models import TrendsTitle, db
 from flask_migrate import Migrate
+import json
 
+from flask_login import LoginManager,login_required
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = '"mysql+pymysql://root:password@localhost/trends'
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:hassan1998@localhost/trends"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 migrate = Migrate(app, db)
@@ -24,7 +26,30 @@ def sign_in():
 
 @app.route('/view_data')
 def view_data():
-    data = TrendsTitle.query.all()
+    data = TrendsTitle.query.order_by(TrendsTitle.counters.desc()).all()
     titles = [i.title for i in data]
+    counts = [i.counters for i in data]
     print(titles)
-    return render_template('view_data.html', data=data, titles=titles[::5])
+    print(counts)
+
+    return render_template('view_data.html', data=data, counts = json.dumps(counts[:10]),titles=json.dumps(titles[:10]))
+
+@app.route('/redirect/<int:id>')
+def redirect(id):
+    print(id)
+    data = TrendsTitle.query.get_or_404(id)
+    return redirect(data.link)
+
+@app.route('/sign_up', methods=['GET', 'POST'])
+def sign_up():
+    if request.method == 'POST':
+        return 'validation'
+    else:
+        return render_template('signup.html')
+
+@app.route('/updateChart')
+def updateChart():
+    data = TrendsTitle.query.order_by(TrendsTitle.counters.desc()).all()
+    titles = [i.title for i in data]
+    counts = [i.counters for i in data]
+    return render_template("chart.html", counts = json.dumps(counts[:10]),titles=json.dumps(titles[:10]))
