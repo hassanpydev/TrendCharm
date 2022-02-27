@@ -194,9 +194,8 @@
            xhttp = new XMLHttpRequest();
            xhttp.onreadystatechange = function () {
 
-            let resp;
             if (this.readyState === 4 && this.status === 200) {
-                resp = JSON.parse(this.responseText);
+                    resp = JSON.parse(this.responseText);
                     myChart.data.labels = [];
                     myChart.data.labels.push({{resp.title_values|safe}})
                     myChart.data.datasets[0].data = []
@@ -244,7 +243,6 @@
            xhttp = new XMLHttpRequest();
            xhttp.onreadystatechange = function () {
 
-            let resp;
             if (this.readyState === 4 && this.status === 200) {
                 document.getElementById('table_data').innerHTML = this.responseText;
             }
