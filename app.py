@@ -1,4 +1,13 @@
-from flask import Flask, request, render_template, redirect, url_for, flash, session,jsonify
+from flask import (
+    Flask,
+    request,
+    render_template,
+    redirect,
+    url_for,
+    flash,
+    session,
+    jsonify,
+)
 from models import TrendsTitle, db
 from flask_migrate import Migrate
 import json
@@ -14,9 +23,9 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 
-@app.route("/")
-def hello_world():  # put application's code here
-    return "Hello World!"
+# @app.route("/")
+# def hello_world():  # put application's code here
+#     return "Hello World!"
 
 
 @app.route("/sign_in", methods=["GET", "POST"])
@@ -27,6 +36,7 @@ def sign_in():
         return render_template("sign_in.html")
 
 
+@app.route("/")
 @app.route("/view_data")
 def view_data():
     data = TrendsTitle.query.order_by(TrendsTitle.counters.desc()).all()
@@ -61,6 +71,16 @@ def sign_up():
 @app.route("/updateChart")
 def updateChart():
     data = TrendsTitle.query.order_by(TrendsTitle.counters.desc()).all()
-    titles = [i.title for i in data][:5]
-    counts = [i.counters for i in data][:5]
-    return {'title': titles, 'counts': counts}
+    titles = [i.title for i in data][:10]
+    counts = [i.counters for i in data][:10]
+    return jsonify(list(zip(titles, counts)))
+
+
+@app.route("/updateTable")
+def updateTable():
+    data = [
+        row.serialize
+        for row in TrendsTitle.query.order_by(TrendsTitle.counters.desc()).all()
+    ]
+    return render_template("data_table.html", data=data)
+    # return jsonify(data)

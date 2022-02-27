@@ -1,0 +1,9 @@
+{% for row in data %}
+    <tr>
+      <td>#</td>
+      <td>{{ row.title }}</td>
+      <td>{{row.counters}}</td>
+      <td>Yes</td>
+      <td><a href="{{ row.link }}" target="_blank" >Open</a></td>
+    </tr>
+{% endfor %}

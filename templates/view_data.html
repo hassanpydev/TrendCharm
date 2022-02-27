@@ -19,9 +19,9 @@
     <link href="https:getbootstrap.com/docs/4.1/examples/dashboard/dashboard.css" rel="stylesheet">
   </head>
 
-  <body onload="get_data()">
+  <body onload="updateChart() ,updateTable()">
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Company name</a>
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">TrendCharm</a>
       <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
       <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
@@ -137,7 +137,7 @@
                   <th>View Google Search</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="table_data">
               {% for trend in data %}
                 <tr>
                   <td>#</td>
@@ -185,19 +185,39 @@
 }
     </script>
     <!-- Graphs -->
+    <div id="chart">
     <script src="https:cdn.jsdelivr.net/npm/chart.js@2.7.1/dist/Chart.min.js"></script>
     <script>
       var ctx = document.getElementById("myChart");
-      var counts = {{ counts| safe }};
-      console.log(counts);
+      function updateChart() {
+           resource_timer =  setTimeout(updateChart, 10000);
+           xhttp = new XMLHttpRequest();
+           xhttp.onreadystatechange = function () {
 
+            let resp;
+            if (this.readyState === 4 && this.status === 200) {
+                resp = JSON.parse(this.responseText);
+                    myChart.data.labels = [];
+                    myChart.data.labels.push({{resp.title_values|safe}})
+                    myChart.data.datasets[0].data = []
+                    myChart.data.datasets[0].data.push({{ resp.counts|safe }})
+                    myChart.update()
+
+                }
+
+
+
+            };
+
+        xhttp.open("GET", "updateChart", true);
+        xhttp.send();
+    }
        var myChart = new Chart(ctx, {
-         type: 'line',
+         type: 'bar',
          data: {
-            {#labels: ["Putin", "دونباس", "سمير صبري", "رابح صقر", "الملك عبدالعزيز", "مطار جازان", "نابولي",'عبارات يوم التأسيس السعودي','مؤسس الدولة السعودية الاولى','لوغانسك ودونيتسك'],#}
-           labels: {{ titles|safe }},
+           labels: ['t','w','z','g'],
            datasets: [{
-             data: {{ counts|safe }},
+             data: [],
              lineTension: 0,
              backgroundColor: 'transparent',
              borderColor: '#007bff',
@@ -218,25 +238,21 @@
            }
          }
        });
-       function get_data() {
-           resource_timer =  setTimeout(get_data, 10000);
+
+    function updateTable() {
+           resource_timer =  setTimeout(updateTable, 10000);
            xhttp = new XMLHttpRequest();
            xhttp.onreadystatechange = function () {
 
             let resp;
             if (this.readyState === 4 && this.status === 200) {
-                resp = JSON.parse(this.responseText);
-                console.log(resp.title)
-                console.log(resp.counts)
-                removeData(myChart);
-                addData(myChart, resp.title, resp.counts);
-
+                document.getElementById('table_data').innerHTML = this.responseText;
             }
         };
-        console.log("Request has been sent")
-        xhttp.open("GET", "updateChart", true);
+        xhttp.open("GET", "updateTable", true);
         xhttp.send();
     }
     </script>
+        </div>
   </body>
 </html>

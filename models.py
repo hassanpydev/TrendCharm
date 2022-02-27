@@ -16,6 +16,16 @@ class TrendsTitle(db.Model):
 
     def __repr__(self):
         return '<trends title="%s">' % self.title
+    @property
+    def serialize(self):
+        return {
+            'title': self.title,
+            'hashed': self.hashed,
+            'stored_date': self.stored_date,
+            'counters': self.counters,
+            'link': self.link
+        }
+
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -27,6 +37,6 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
     activated = db.Column(db.Boolean, default=False)
+
     def __repr__(self):
         return '<User %r>' % self.username
-    
