@@ -1,23 +1,14 @@
-from flask import (
-    Flask,
-    request,
-    render_template,
-    redirect,
-    url_for,
-    flash,
-    session,
-    jsonify,
-)
+import flask
 from models import TrendsTitle, db
 from flask_migrate import Migrate
 import json
 
 from flask_login import LoginManager, login_required
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
 app.config[
     "SQLALCHEMY_DATABASE_URI"
-] = "mysql+pymysql://root:hassan1998@localhost/trends"
+] = "mysql+pymysql://root:@localhost/trends"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 migrate = Migrate(app, db)
@@ -30,10 +21,10 @@ migrate = Migrate(app, db)
 
 @app.route("/sign_in", methods=["GET", "POST"])
 def sign_in():
-    if request.method == "POST":
+    if flask.request.method == "POST":
         pass
     else:
-        return render_template("sign_in.html")
+        return flask.render_template("sign_in.html")
 
 
 @app.route("/")
@@ -45,7 +36,7 @@ def view_data():
     print(titles)
     print(counts)
 
-    return render_template(
+    return flask.render_template(
         "view_data.html",
         data=data,
         counts=json.dumps(counts[:10]),
@@ -57,15 +48,15 @@ def view_data():
 def redirect(id):
     print(id)
     data = TrendsTitle.query.get_or_404(id)
-    return redirect(data.link)
+    return flask.redirect(data.link)
 
 
 @app.route("/sign_up", methods=["GET", "POST"])
 def sign_up():
-    if request.method == "POST":
+    if flask.request.method == "POST":
         return "validation"
     else:
-        return render_template("signup.html")
+        return flask.render_template("signup.html")
 
 
 @app.route("/updateChart")
@@ -73,7 +64,7 @@ def updateChart():
     data = TrendsTitle.query.order_by(TrendsTitle.counters.desc()).all()
     titles = [i.title for i in data][:10]
     counts = [i.counters for i in data][:10]
-    return jsonify(list(zip(titles, counts)))
+    return flask.jsonify(list(zip(titles, counts)))
 
 
 @app.route("/updateTable")
@@ -82,5 +73,5 @@ def updateTable():
         row.serialize
         for row in TrendsTitle.query.order_by(TrendsTitle.counters.desc()).all()
     ]
-    return render_template("data_table.html", data=data)
+    return flask.render_template("data_table.html", data=data)
     # return jsonify(data)
